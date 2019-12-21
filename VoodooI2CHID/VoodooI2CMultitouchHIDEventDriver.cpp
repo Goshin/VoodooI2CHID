@@ -140,26 +140,6 @@ void VoodooI2CMultitouchHIDEventDriver::handleDigitizerReport(AbsoluteTime times
     if (!wrapper)
         return;
 
-    UInt8 finger_count = digitiser.fingers->getCount();
-    
-    if (finger_count) {
-        // Check if we are sending the report to the right wrapper, 99% of the time, `digitiser.current_report - 1` will
-        // be the correct index but in rare circumstances, it won't be so we should ensure we have the right index
-    
-        if (!wrapper->first_identifier)
-            return;
-    
-        UInt8 first_identifier = wrapper->first_identifier->getValue() ? wrapper->first_identifier->getValue() : 0;
-    
-        UInt8 actual_index = static_cast<int>(roundUp(first_identifier + 1, finger_count)/finger_count) - 1;
-    
-        if (actual_index != digitiser.current_report - 1) {
-            wrapper = OSDynamicCast(VoodooI2CHIDTransducerWrapper, digitiser.wrappers->getObject(actual_index));
-            if (!wrapper)
-                return;
-        }
-    }
-
     for (int i = 0; i < wrapper->transducers->getCount(); i++) {
         VoodooI2CDigitiserTransducer* transducer = OSDynamicCast(VoodooI2CDigitiserTransducer, wrapper->transducers->getObject(i));
         handleDigitizerTransducerReport(transducer, timestamp, report_id);
