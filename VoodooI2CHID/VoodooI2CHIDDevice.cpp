@@ -436,6 +436,9 @@ IOReturn VoodooI2CHIDDevice::setPowerState(unsigned long whichState, IOService* 
         return kIOReturnInvalid;
     if (whichState == 0) {
         if (awake) {
+            if (interrupt_simulator) {
+                interrupt_simulator->disable();
+            }
             while (read_in_progress) {
                 IOSleep(100);
             }
@@ -463,6 +466,10 @@ IOReturn VoodooI2CHIDDevice::setPowerState(unsigned long whichState, IOService* 
             read_in_progress = false;
             
             IOLog("%s::%s Woke up\n", getName(), name);
+            if (interrupt_simulator) {
+                interrupt_simulator->setTimeoutMS(200);
+                interrupt_simulator->enable();
+            }
         }
     }
     return kIOPMAckImplied;
