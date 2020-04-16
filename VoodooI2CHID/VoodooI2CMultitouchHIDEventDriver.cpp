@@ -838,6 +838,18 @@ IOReturn VoodooI2CMultitouchHIDEventDriver::setProperties(OSObject * properties)
                         }
                     }
                 }
+                // System -> Preferences -> Trackpad -> Force Click and haptic feedback
+                // ActuateDetents
+                if (key->isEqualTo("ActuateDetents")) {
+                    OSNumber* value = OSDynamicCast(OSNumber, dict->getObject(key));
+
+                    if (value != NULL) {
+                        IOLog("%s::setProperties %s = %d\n", getName(), key->getCStringNoCopy(), value->unsigned32BitValue());
+                        if (multitouch_interface) {
+                            multitouch_interface->isForceClickEnabled = value->unsigned32BitValue();
+                        }
+                    }
+                }
             }
 
             i->release();
